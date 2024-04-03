@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +20,7 @@ import java.security.Key;
 import lombok.SneakyThrows;
 
 @Component
-public class SecurityUtils {
-
-    // private static final String AUTHORIZATION_HEADER = "Authorization";
-    // private static final String AUTHORIZATION_PREFIX = "Bearer_";
+public class JwtUtils {
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
@@ -52,12 +50,13 @@ public class SecurityUtils {
             return Jwts.parser().verifyWith((SecretKey) getKey(this.SECRET_KEY)).build().parseSignedClaims(token)
                     .getPayload().getSubject();
         } catch (Exception e) {
+            System.out.println(e);
             return null;
         }
     }
 
     public static JwtToken getSession() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof AnonymousAuthenticationToken) {
             throw new AccessDeniedException("Not authorized.");
         }

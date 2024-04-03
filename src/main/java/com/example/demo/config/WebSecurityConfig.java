@@ -11,13 +11,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
-    @Autowired
-    private UserDetailsService userDetailsService;
+
+    private final UserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     static PasswordEncoder passwordEncoder() {
@@ -25,25 +30,24 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter)
+    SecurityFilterChain filterChain(HttpSecurity http)
             throws Exception {
+
         http
-                .sessionManagement(se -> se.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/secured/**").authenticated()
-                        .requestMatchers("/admin/**").hasAuthority("admin")
-                        .anyRequest().permitAll())
-                .addFilterAfter(jwtAuthenticationFilter, SessionManagementFilter.class);
+                        .requestMatchers("/api/**")
+                        .permitAll()
+                // .anyRequest().authenticated()
+                )
+                .sessionManagement(se -> se.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
 
     }
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
+    protected final void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 }
