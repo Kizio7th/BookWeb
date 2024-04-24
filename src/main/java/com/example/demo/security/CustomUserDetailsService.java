@@ -9,24 +9,26 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.example.demo.model.User;
-import com.example.demo.model.UserRole;
+import com.example.demo.model.entity.UserRole;
+import com.example.demo.model.entity.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.UserRoleRepository;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
+    private UserRoleRepository userRoleRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findOneByUsername(username);
         if (user != null) {
             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                    mapRolesToAuthorities(user.getUserRoles()));
+                    mapRolesToAuthorities(userRoleRepository.findByUser(user)));
         } else {
             throw new UsernameNotFoundException("Invalid username or password.");
         }

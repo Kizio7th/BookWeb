@@ -1,6 +1,7 @@
-package com.example.demo.model;
+package com.example.demo.model.entity;
 
 import java.util.*;
+
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -10,32 +11,29 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "role")
+public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column()
-    private String fullname;
-
     @Column(unique = true)
-    private String username;
+    private String name;
 
-    @Column()
-    private String email;
-
-    @Column()
-    private String password;
-
-    @Column()
-    private Boolean status;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     private List<UserRole> userRoles = new ArrayList<>();
+
+    public Role(String name) {
+        this.name = name;
+    }
 
 }

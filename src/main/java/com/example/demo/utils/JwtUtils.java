@@ -1,65 +1,74 @@
 package com.example.demo.utils;
 
+import java.security.Key;
 import java.util.Date;
 
-import javax.crypto.SecretKey;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.config.JwtToken;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-
-import java.security.Key;
-import lombok.SneakyThrows;
+import io.jsonwebtoken.security.SignatureException;
 
 @Component
 public class JwtUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+
     @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    private String jwtSecret;
 
     @Value("${jwt.expiration}")
-    private int JWT_EXPIRATION;
+    private long jwtExpiration;
 
-    public Key getKey(String secretKey) {
-        return Keys.hmacShaKeyFor(this.SECRET_KEY.getBytes());
+    private final Key key() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    @SneakyThrows
-    public String generateToken(JwtToken jwtToken) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + this.JWT_EXPIRATION);
-        Key key = getKey(this.SECRET_KEY);
-        return Jwts.builder()
-                .subject(JsonUtils.toJson(jwtToken))
-                .issuedAt(new Date())
-                .expiration(expiryDate)
-                .signWith(key)
+    public String generateToken(Authentication authentication) {
+        String username = authentication.getName();
+        Date currentDate = new Date();
+        Date expireDate = new Date(currentDate.getTime() + jwtExpiration);
+        String token = Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(expireDate)
+                .signWith(key())
                 .compact();
+        return token;
     }
 
-    public String validateToken(String token) {
+    public String getUsername(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        String username = claims.getSubject();
+        return username;
+    }
+
+    public boolean validateToken(String token) throws SignatureException{
         try {
-            return Jwts.parser().verifyWith((SecretKey) getKey(this.SECRET_KEY)).build().parseSignedClaims(token)
-                    .getPayload().getSubject();
-        } catch (Exception e) {
-            System.out.println(e);
-            return null;
-        }
-    }
-
-    public static JwtToken getSession() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof AnonymousAuthenticationToken) {
-            throw new AccessDeniedException("Not authorized.");
-        }
-        return (JwtToken) authentication.getPrincipal();
+            Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parse(token);
+            return true;
+        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            System.out.println("Token không hợp lệ");
+            logger.error("Token không hợp lệ: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            logger.error("Token hết hạn: {}", e.getMessage());
+        } 
+        return false;
     }
 }
