@@ -3,14 +3,18 @@ package com.example.demo.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 
 import com.example.demo.model.dto.EntityResponse;
 import com.example.demo.model.dto.JWTAuthResponse;
@@ -32,9 +36,14 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody RegisterDTO userDto) {
+    public ResponseEntity<Object> register(@RequestPart RegisterDTO userDto, MultipartFile avatar) {
         User user = new ModelMapper().map(userDto, User.class);
-        user = userService.saveUser(user);
+        String originalFileName = avatar.getOriginalFilename();
+        String fileExtension = StringUtils.getFilenameExtension(originalFileName);
+        if (!"jpg".equalsIgnoreCase(fileExtension) && !"png".equalsIgnoreCase(fileExtension)) {
+            return EntityResponse.content("Avatar must be in JPG or PNG format", HttpStatus.BAD_REQUEST, null);
+        }
+        user = userService.saveUser(user, avatar);
         return EntityResponse.content("Registered", HttpStatus.OK, null);
     }
 

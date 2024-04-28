@@ -42,8 +42,14 @@ public class User {
     @Column()
     private String password;
 
+    @Column(nullable = true)
+    private String gender;
+
     @Column()
-    private Boolean status;
+    private Boolean status = true;
+
+    @Column()
+    private String avatar = "default";
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<UserRole> userRoles = new ArrayList<>();

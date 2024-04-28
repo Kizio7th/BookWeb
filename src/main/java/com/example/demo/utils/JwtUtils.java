@@ -63,9 +63,12 @@ public class JwtUtils {
                     .build()
                     .parse(token);
             return true;
-        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException | SignatureException e) {
+        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             System.out.println("Token không hợp lệ");
             logger.error("Token không hợp lệ: {}", e.getMessage());
+        } catch (SignatureException e) {
+            System.out.println("Sai chữ kí");
+            logger.error("Sai chữ kí: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
             logger.error("Token hết hạn: {}", e.getMessage());
         }
