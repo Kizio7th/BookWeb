@@ -40,8 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = this.getJwtFromRequest(request);
-
-        if (StringUtils.hasText(token) && jwtUtils.validateToken(token)) {
+        if (!request.getRequestURI().startsWith("/api/public") && StringUtils.hasText(token)
+                && jwtUtils.validateToken(token)) {
             String username = jwtUtils.getUsername(token);
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -50,7 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     userDetails.getAuthorities());
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
         }
         filterChain.doFilter(request, response);
     }

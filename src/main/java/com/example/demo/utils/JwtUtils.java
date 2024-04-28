@@ -56,19 +56,19 @@ public class JwtUtils {
         return username;
     }
 
-    public boolean validateToken(String token) throws SignatureException{
+    public boolean validateToken(String token) throws SignatureException {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key())
                     .build()
                     .parse(token);
             return true;
-        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException | SignatureException e) {
             System.out.println("Token không hợp lệ");
             logger.error("Token không hợp lệ: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
             logger.error("Token hết hạn: {}", e.getMessage());
-        } 
+        }
         return false;
     }
 }

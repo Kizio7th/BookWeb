@@ -2,6 +2,7 @@ package com.example.demo.model.entity;
 
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,10 +13,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -30,6 +33,7 @@ public class Role {
     private String name;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<UserRole> userRoles = new ArrayList<>();
 
     public Role(String name) {

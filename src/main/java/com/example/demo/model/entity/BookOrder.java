@@ -1,14 +1,14 @@
 package com.example.demo.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,25 +20,21 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "user_role")
-public class UserRole {
-
+@Table(name = "book_order")
+public class BookOrder {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @JoinColumn(name = "user", nullable = false)
-    private User user;
+    @Column()
+    private Long quantity;
+
+    @OneToOne()
+    @JoinColumn(name = "book") 
+    private Book book;
 
     @ManyToOne()
-    @JoinColumn(name = "role", nullable = false)
-    private Role role;
-
-    public UserRole(User user, Role role) {
-        this.user = user;
-        this.role = role;
-    }
-
+    @JoinColumn(name = "cart")
+    private Cart cart;
 }

@@ -35,7 +35,6 @@ public class AuthController {
     public ResponseEntity<Object> register(@RequestBody RegisterDTO userDto) {
         User user = new ModelMapper().map(userDto, User.class);
         user = userService.saveUser(user);
-        // userDto.setRoleList(userService.loadRoles(user));
         return EntityResponse.content("Registered", HttpStatus.OK, null);
     }
 
