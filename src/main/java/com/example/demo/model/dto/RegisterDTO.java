@@ -1,7 +1,5 @@
 package com.example.demo.model.dto;
 
-import java.util.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +19,4 @@ public class RegisterDTO {
 
     private String email;
 
-    private List<String> roleList = new ArrayList<>();
 }
