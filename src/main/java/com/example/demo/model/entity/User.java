@@ -42,9 +42,6 @@ public class User {
     @Column()
     private String password;
 
-    @Column(nullable = true)
-    private String gender;
-
     @Column()
     private Boolean status = true;
 

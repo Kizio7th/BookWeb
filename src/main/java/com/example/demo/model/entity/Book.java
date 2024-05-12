@@ -1,9 +1,8 @@
 package com.example.demo.model.entity;
 
 import java.sql.Date;
-import java.util.*;
-
-import org.springframework.data.annotation.CreatedDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
