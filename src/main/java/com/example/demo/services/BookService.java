@@ -23,6 +23,13 @@ public class BookService {
     private FileStorageUtils fileStorageUtils;
     private final String category = "book";
 
+    public BookDto getBook(Long id) {
+        Book book = bookRepository.findById(id).orElse(null);
+        BookDto bookDto = new ModelMapper().map(book, BookDto.class);
+        bookDto.setCover(fileStorageUtils.getFile(book.getCover()));
+        return (book != null) ? bookDto : null;
+    }
+
     public String addBook(Book book, MultipartFile image) {
         String cover = "default.jpg";
         if (image.getSize() != 0) {
@@ -39,10 +46,10 @@ public class BookService {
     }
 
     // public String modifyBook(Book book, Long id) {
-    //     Book old = bookRepository.findOneById(id);
-    //     Book book = new ModelMapper().map(old, Book.class);
+    // Book old = bookRepository.findOneById(id);
+    // Book book = new ModelMapper().map(old, Book.class);
 
-    //     return "Book successfully modified";
+    // return "Book successfully modified";
 
     // }
 

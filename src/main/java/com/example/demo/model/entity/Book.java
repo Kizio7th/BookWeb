@@ -36,6 +36,9 @@ public class Book {
     private String author;
 
     @Column()
+    private Float price;
+
+    @Column()
     private Date releaseDate;
 
     @Column(columnDefinition = "TEXT")

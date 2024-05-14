@@ -1,5 +1,6 @@
 package com.example.demo.model.dto;
 
+import java.io.InputStream;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +23,13 @@ public class BookDto {
 
     private String description;
 
+    private Float price;
+
     private Long sold;
 
     private Long rating;
+
+    private InputStream cover = null;
 
     private List<String> categories = new ArrayList<>();
 }

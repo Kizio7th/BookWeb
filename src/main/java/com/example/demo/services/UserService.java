@@ -4,14 +4,12 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.model.entity.UserRole;
-import com.example.demo.model.dto.EntityResponse;
 import com.example.demo.model.entity.Role;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.RoleRepository;
@@ -34,7 +32,7 @@ public class UserService {
 
     public String saveUser(User user, MultipartFile image) {
         String avatar = "default.jpg";
-        if (image.getSize() != 0) {
+        if (image != null && image.getSize() != 0) {
             String originalFileName = image.getOriginalFilename();
             String fileExtension = StringUtils.getFilenameExtension(originalFileName);
             if (!"jpg".equalsIgnoreCase(fileExtension) && !"png".equalsIgnoreCase(fileExtension)) {

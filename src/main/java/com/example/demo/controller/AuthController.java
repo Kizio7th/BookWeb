@@ -34,9 +34,9 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestPart RegisterDTO userDto, MultipartFile avatar) {
+    public ResponseEntity<Object> register(@RequestBody RegisterDTO userDto) {
         User user = new ModelMapper().map(userDto, User.class);
-        String message = userService.saveUser(user, avatar);
+        String message = userService.saveUser(user, null);
         return EntityResponse.content(message, HttpStatus.OK, null);
     }
 
